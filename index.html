@@ -198,10 +198,16 @@ td input{padding:6px 8px;font-size:13px}
 
     <section class="panel" aria-labelledby="t-send">
       <h2 id="t-send">Enviar</h2>
-      <p style="font-size:14px;color:var(--muted)">Revise seus itens e toque em <b>Enviar pelo WhatsApp</b>. A mensagem já vai pronta; é só escolher o contato do Bardi e enviar. Sem WhatsApp, use <b>Copiar minhas respostas</b> e mande o texto pelo Teams ou e-mail.</p>
+      <p id="send-status" style="font-size:14px;color:var(--muted)">Revise seus itens e toque em <b>Enviar minha análise</b>. Se precisar corrigir algo depois, é só enviar de novo com o mesmo ID e nome: vale a versão mais recente.</p>
       <div class="actions">
-        <a class="primary" id="whats" href="https://wa.me/" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">Enviar pelo WhatsApp</a>
-        <button class="ghost" id="copiar-minhas" type="button">Copiar minhas respostas</button>
+        <button class="primary" id="enviar" type="button">Enviar minha análise</button>
+      </div>
+      <div id="alternativas" hidden>
+        <p class="notice" id="alt-msg">Não foi possível enviar agora. Use uma das opções abaixo para mandar sua análise ao Bardi.</p>
+        <div class="actions" style="margin-top:10px">
+          <a class="primary" id="whats" href="https://wa.me/" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">Enviar pelo WhatsApp</a>
+          <button class="ghost" id="copiar-minhas" type="button">Copiar minhas respostas</button>
+        </div>
       </div>
       <textarea id="fallback" rows="4" hidden aria-label="Texto para copiar manualmente"></textarea>
       <p class="err" id="err-send" hidden></p>
@@ -220,8 +226,11 @@ td input{padding:6px 8px;font-size:13px}
     </section>
     <div id="fac-body" class="wrap" hidden>
       <section class="panel">
-        <h2>1 · Colar as mensagens recebidas</h2>
-        <p style="font-size:14px">Cole aqui as mensagens que chegaram pelo WhatsApp, Teams ou e-mail. Pode colar várias de uma vez, quantas vezes quiser: cada mensagem termina com um código <span class="mono">#SWOT:…#</span>. Se a mesma pessoa enviar de novo, vale a versão mais recente. As respostas ficam guardadas neste navegador.</p>
+        <h2>1 · Respostas gravadas</h2>
+        <p style="font-size:14px">As respostas enviadas pelo formulário ficam gravadas na planilha de respostas. Toque em <b>Atualizar</b> para ver as mais recentes.</p>
+        <div class="actions"><button class="primary" id="atualizar" type="button">Atualizar</button><span id="srv-status" style="font-size:13px;color:var(--muted)"></span></div>
+        <h3 style="margin-top:8px">Recebeu alguma resposta pelo WhatsApp?</h3>
+        <p style="font-size:14px">Cole aqui as mensagens (pode colar várias de uma vez). Cada uma termina com um código <span class="mono">#SWOT:…#</span>. Elas entram junto com as gravadas na exportação.</p>
         <textarea id="imp-txt" rows="5" aria-label="Mensagens recebidas"></textarea>
         <div class="actions"><button class="primary" id="imp-btn" type="button">Adicionar respostas</button><span id="imp-status" style="font-size:13px;color:var(--muted)"></span></div>
       </section>
@@ -234,17 +243,17 @@ td input{padding:6px 8px;font-size:13px}
       <section class="panel">
         <h2>3 · Levar para a planilha</h2>
         <ol class="steps">
-          <li>Toque em <b>Baixar planilha</b> (ou <b>Copiar tudo</b>).</li>
+          <li>Toque em <b>Baixar planilha (.xlsx)</b>: o arquivo traz todas as respostas, já no formato da planilha SWOT.</li>
           <li>Abra o arquivo baixado, selecione tudo (<span class="mono">Ctrl+A</span>) e copie (<span class="mono">Ctrl+C</span>).</li>
           <li>Na planilha SWOT, abra a aba <span class="mono">Colar Export Forms</span>, clique em <span class="mono">A1</span> e cole (<span class="mono">Ctrl+V</span>).</li>
           <li>Confira a aba <span class="mono">Mapa Forms</span> (tudo ✔), agrupe os temas no <span class="mono">Consolidado</span> e associe cada contribuição na coluna K da <span class="mono">Respostas Forms</span>.</li>
         </ol>
         <div class="actions">
-          <button class="primary" id="xlsx" type="button">Baixar planilha</button>
+          <button class="primary" id="xlsx" type="button">Baixar planilha (.xlsx)</button>
           <button class="ghost" id="cp-all" type="button">Copiar tudo (colar em A1)</button>
-          <button class="ghost" id="limpar" type="button">Apagar respostas deste navegador</button>
+          <button class="ghost" id="limpar" type="button">Apagar mensagens coladas neste navegador</button>
         </div>
-        <p class="notice" id="confirm-limpar" hidden>Isso apaga todas as respostas guardadas neste navegador. <button class="ghost" id="limpar-sim" type="button">Sim, apagar</button> <button class="ghost" id="limpar-nao" type="button">Cancelar</button></p>
+        <p class="notice" id="confirm-limpar" hidden>Isso apaga só as mensagens de WhatsApp coladas neste navegador. As respostas gravadas na planilha não são afetadas. <button class="ghost" id="limpar-sim" type="button">Sim, apagar</button> <button class="ghost" id="limpar-nao" type="button">Cancelar</button></p>
         <textarea id="fac-fallback" rows="4" hidden aria-label="Texto para copiar manualmente"></textarea>
       </section>
     </div>
@@ -256,6 +265,9 @@ td input{padding:6px 8px;font-size:13px}
 /* Número de WhatsApp do facilitador (só dígitos, com DDI e DDD, ex.: 5521999999999).
    Vazio = a pessoa escolhe o contato no WhatsApp. */
 const WHATS_NUMERO = "";
+/* Endereço do banco de respostas (Google Apps Script). Lido do arquivo endpoint.txt publicado ao lado desta página. */
+let ENDPOINT = "";
+const carregarEndpoint = fetch("endpoint.txt",{cache:"no-store"}).then(r=>r.ok?r.text():"").then(t=>{t=(t||"").trim();if(/^https:\/\/script\.google\.com\//.test(t))ENDPOINT=t}).catch(()=>{});
 const SENHA_HASH = "614c1d9e9dee8919b3f9663d0866821ef232f53ce6b1ea70083d2d02d72c6f75";
 const DIMENSOES=["Segurança","Pessoas e Capacitação","Gestão e Rotina","Planejamento e Programação","Confiabilidade e Equipamentos","Materiais e Sobressalentes","Custos e Orçamento","Tecnologia e Sistemas","Qualidade e Meio Ambiente","Terceiros e Fornecedores"];
 const IMP_LBL={1:"Baixa",2:"Moderada",3:"Média",4:"Alta",5:"Crítica"};
@@ -291,6 +303,7 @@ const Q={
   trap:"Se a causa está dentro da equipe (\"nosso estoque mal dimensionado\"), é Fraqueza.",
   ph:"Ex.: Escassez de eletricistas e instrumentistas qualificados na região"}
 };
+
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -382,6 +395,24 @@ async function copiar(text,fb){
   try{await navigator.clipboard.writeText(text);return true}catch(e){const f=$(fb);f.hidden=false;f.value=text;f.focus();f.select();return false}
 }
 
+async function enviar(){
+  if(!validate())return;
+  const b=$("#enviar");b.disabled=true;const txt=b.textContent;b.textContent="Enviando…";
+  try{
+    const res=await chamar(payload());
+    if(res&&res.ok){
+      $("#alternativas").hidden=true;
+      $("#send-status").innerHTML=`<span class="notice ok" style="display:block">Análise ${res.atualizada?"atualizada":"enviada"} em ${fmt(new Date().toISOString())}. Obrigado! Se quiser corrigir algo, altere e envie de novo.</span>`;
+      b.textContent="Enviar novamente";toast("Análise gravada");
+      return;
+    }
+    throw new Error("falha");
+  }catch(e){
+    b.textContent=txt;$("#alternativas").hidden=false;
+    $("#alternativas").scrollIntoView({behavior:"smooth",block:"center"});
+  }finally{b.disabled=false}
+}
+
 /* ---------------- abas e senha ---------------- */
 async function sha256(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
 function setupTabs(){
@@ -389,12 +420,31 @@ function setupTabs(){
   $("#tab-form").addEventListener("click",()=>sw("form"));$("#tab-fac").addEventListener("click",()=>sw("fac"));
   $("#lock-form").addEventListener("submit",async e=>{e.preventDefault();const er=$("#err-senha");let ok=false;
     try{ok=(await sha256($("#senha").value.trim()))===SENHA_HASH}catch(x){ok=false}
-    if(ok){er.hidden=true;$("#senha").value="";liberar()}else{er.textContent="Senha incorreta. Confira maiúsculas e minúsculas.";er.hidden=false}});
+    if(ok){er.hidden=true;senhaSessao=$("#senha").value.trim();$("#senha").value="";liberar();atualizar()}else{er.textContent="Senha incorreta. Confira maiúsculas e minúsculas.";er.hidden=false}});
 }
-function liberar(){$("#lock").hidden=true;$("#fac-body").hidden=false;try{sessionStorage.setItem("swot-ep-fac","1")}catch(e){}renderFac()}
+function liberar(){$("#lock").hidden=true;$("#fac-body").hidden=false;renderFac()}
 
 /* ---------------- facilitador ---------------- */
 let base=store.get("swot-ep-base")||{};
+let senhaSessao="";
+let servidor=[]; /* linhas no formato da exportação do Forms, sem o cabeçalho */
+async function chamar(corpo){
+  await carregarEndpoint;
+  if(!ENDPOINT)throw new Error("sem-endpoint");
+  const r=await fetch(ENDPOINT,{method:"POST",body:JSON.stringify(corpo)});
+  return await r.json();
+}
+async function atualizar(){
+  const st=$("#srv-status");
+  st.textContent="Buscando respostas…";
+  try{
+    const res=await chamar({acao:"listar",senha:senhaSessao});
+    if(!res.ok){st.textContent=res.erro==="senha"?"A senha do banco de respostas não confere.":"Não foi possível ler as respostas.";return}
+    servidor=(res.linhas||[]).slice(1).filter(r=>r.some(c=>c!==""&&c!==null));
+    st.textContent=`${servidor.length} resposta(s) gravada(s) · atualizado às ${fmt(new Date().toISOString()).slice(11)}`;
+    renderFac();
+  }catch(e){st.textContent=e&&e.message==="sem-endpoint"?"O banco de respostas ainda não foi configurado.":"Sem conexão com o banco de respostas. Tente de novo."}
+}
 const chave=p=>((p.m||"")+"|"+(p.n||"")).toLowerCase().replace(/\s+/g," ").trim();
 function importar(){
   const txt=$("#imp-txt").value;
@@ -412,26 +462,40 @@ function importar(){
   $("#imp-txt").value="";renderFac();
 }
 const lista=()=>Object.values(base).sort((a,b)=>(a.t||"").localeCompare(b.t||""));
+function linhaDe(p){
+  const r=["",p.t,p.t,"","",p.t,p.m,p.n,p.f,p.e];
+  for(const q of "SWOT"){const its=p.i.filter(x=>x[0]===q);for(let n=0;n<3;n++){const x=its[n];r.push(x?x[1]:"",x?(DIMENSOES[x[2]]||""):"",x?x[3]:"")}}
+  return r;
+}
+/* Gravadas + coladas do WhatsApp; mesma pessoa (ID + nome) fica só com a versão mais recente */
+function todas(){
+  const mapa=new Map();
+  const k=r=>(String(r[6])+"|"+String(r[7])).toLowerCase().replace(/\s+/g," ").trim();
+  const quando=r=>String(r[2]||"");
+  for(const r of [...servidor,...lista().map(linhaDe)]){const key=k(r);const ant=mapa.get(key);if(!ant||quando(r)>quando(ant))mapa.set(key,r)}
+  const inicio=r=>String(r[1]||"");
+  return [...mapa.values()].sort((a,b)=>inicio(a).localeCompare(inicio(b))); /* ordem estável: novas respostas sempre no final */
+}
+const contaQ=(r,q)=>{const o="SWOT".indexOf(q);let c=0;for(let n=0;n<3;n++)if(String(r[10+o*9+n*3]||"").trim())c++;return c};
 const fmt=iso=>{const d=new Date(iso);if(isNaN(d))return "";const p=n=>String(n).padStart(2,"0");return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`};
 function renderFac(){
-  const L=lista();const tot=L.reduce((a,p)=>a+p.i.length,0);
-  $("#stats").innerHTML=[["Participantes",L.length],["Contribuições",tot]].map(([l,v])=>`<div class="stat"><b>${v}</b><small>${l}</small></div>`).join("");
-  const cnt=q=>L.reduce((a,p)=>a+p.i.filter(x=>x[0]===q).length,0);const mx=Math.max(1,...[..."SWOT"].map(cnt));
+  const L=todas();const tot=L.reduce((a,r)=>a+[..."SWOT"].reduce((x,q)=>x+contaQ(r,q),0),0);
+  $("#stats").innerHTML=[["Participantes",L.length],["Contribuições",tot],["Pelo WhatsApp",lista().length]].map(([l,v])=>`<div class="stat"><b>${v}</b><small>${l}</small></div>`).join("");
+  const cnt=q=>L.reduce((a,r)=>a+contaQ(r,q),0);const mx=Math.max(1,...[..."SWOT"].map(cnt));
   $("#bars").innerHTML=[..."SWOT"].map(q=>`<div class="bar" style="--qc:var(${Q[q].c})"><span>${q} · ${Q[q].nome}</span><span class="track"><i style="width:${cnt(q)/mx*100}%"></i></span><span>${cnt(q)}</span></div>`).join("");
   const tb=$("#rows");
-  if(!L.length){tb.innerHTML=`<tr><td colspan="9" class="empty">Nenhuma resposta ainda. Cole as mensagens recebidas na etapa 1.</td></tr>`;return}
-  tb.innerHTML=L.map(p=>`<tr><td class="mono">${esc(p.m)}</td><td>${esc(p.n)}</td><td>${esc(p.e)}</td><td class="mono">${fmt(p.t)}</td>${[..."SWOT"].map(q=>`<td class="mono">${p.i.filter(x=>x[0]===q).length}</td>`).join("")}<td><button class="rm" type="button" data-k="${esc(chave(p))}">Remover</button></td></tr>`).join("");
-  tb.querySelectorAll("button[data-k]").forEach(b=>b.addEventListener("click",()=>{delete base[b.dataset.k];store.set("swot-ep-base",base);renderFac();toast("Resposta removida")}));
+  if(!L.length){tb.innerHTML=`<tr><td colspan="9" class="empty">Nenhuma resposta ainda. Toque em Atualizar depois que o time começar a responder.</td></tr>`;return}
+  tb.innerHTML=L.map(r=>`<tr><td class="mono">${esc(r[6])}</td><td>${esc(r[7])}</td><td>${esc(r[9])}</td><td class="mono">${fmt(r[2])}</td>${[..."SWOT"].map(q=>`<td class="mono">${contaQ(r,q)}</td>`).join("")}<td></td></tr>`).join("");
 }
 /* Mesmo formato da exportação do Microsoft Forms, lido pela aba Colar Export Forms da planilha */
 function grade(datas){
   const h=["ID","Hora de início","Hora de conclusão","Email","Nome","Hora da última modificação","Seu ID","Seu nome","Sua função","Sua equipe / turno"];
   for(const q of "SWOT")for(let n=1;n<=3;n++)h.push(`${WORD[q]} ${n} - Descreva`,`${WORD[q]} ${n} - Dimensão`,`${WORD[q]} ${n} - Importância`);
   const g=[h];
-  lista().forEach((p,idx)=>{
-    const d=new Date(p.t);const dt=datas?(isNaN(d)?"":d):fmt(p.t);
-    const r=[idx+1,dt,dt,"","","",p.m,p.n,p.f,p.e];
-    for(const q of "SWOT"){const its=p.i.filter(x=>x[0]===q);for(let n=0;n<3;n++){const x=its[n];r.push(x?x[1]:"",x?(DIMENSOES[x[2]]||""):"",x?x[3]:"")}}
+  todas().forEach((r0,idx)=>{
+    const r=r0.slice(0,h.length);while(r.length<h.length)r.push("");
+    r[0]=idx+1;
+    for(const c of [1,2,5]){const d=new Date(r[c]);r[c]=r[c]===""||isNaN(d)?"":(datas?d:fmt(r[c]))}
     g.push(r);
   });
   for(let k=g.length;k<=100;k++)g.push(new Array(h.length).fill(""));
@@ -439,7 +503,8 @@ function grade(datas){
 }
 function loadXLSX(){return new Promise((res,rej)=>{if(window.XLSX)return res(window.XLSX);const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=()=>res(window.XLSX);s.onerror=rej;document.head.appendChild(s)})}
 async function baixar(){
-  if(!lista().length){toast("Ainda não há respostas para exportar");return}
+  await atualizar();
+  if(!todas().length){toast("Ainda não há respostas para exportar");return}
   try{
     const X=await loadXLSX();const wb=X.utils.book_new();
     const ws=X.utils.aoa_to_sheet(grade(true),{cellDates:true,dateNF:"dd/mm/yyyy hh:mm"});
@@ -452,19 +517,23 @@ async function baixar(){
 function init(){
   CAMPOS.forEach(k=>{$("#"+k).value=state[k]||"";$("#"+k).addEventListener("input",saveDraft)});
   renderQuads();setupTabs();
+  $("#enviar").addEventListener("click",enviar);
   $("#whats").addEventListener("click",e=>{if(!validate()){e.preventDefault();return}
     $("#whats").href=`https://wa.me/${WHATS_NUMERO}?text=`+encodeURIComponent(mensagem(payload()));
     toast(WHATS_NUMERO?"Confira a mensagem no WhatsApp e envie":"Escolha o contato do Bardi no WhatsApp e envie")});
   $("#copiar-minhas").addEventListener("click",async()=>{if(!validate())return;const ok=await copiar(mensagem(payload()),"#fallback");toast(ok?"Respostas copiadas. Cole no Teams ou e-mail para o Bardi":"Selecione o texto abaixo e copie")});
   $("#imp-btn").addEventListener("click",importar);
+  $("#atualizar").addEventListener("click",atualizar);
   $("#xlsx").addEventListener("click",baixar);
-  $("#cp-all").addEventListener("click",async()=>{if(!lista().length){toast("Ainda não há respostas");return}const ok=await copiar(grade(false).map(r=>r.map(c=>String(c??"").replace(/[\t\n\r]+/g," ")).join("\t")).join("\n"),"#fac-fallback");toast(ok?"Copiado. Cole em Colar Export Forms!A1":"Selecione o texto abaixo e copie")});
+  $("#cp-all").addEventListener("click",async()=>{await atualizar();if(!todas().length){toast("Ainda não há respostas");return}const ok=await copiar(grade(false).map(r=>r.map(c=>String(c??"").replace(/[\t\n\r]+/g," ")).join("\t")).join("\n"),"#fac-fallback");toast(ok?"Copiado. Cole em Colar Export Forms!A1":"Selecione o texto abaixo e copie")});
   $("#limpar").addEventListener("click",()=>{$("#confirm-limpar").hidden=false});
   $("#limpar-nao").addEventListener("click",()=>{$("#confirm-limpar").hidden=true});
   $("#limpar-sim").addEventListener("click",()=>{base={};store.del("swot-ep-base");$("#confirm-limpar").hidden=true;renderFac();toast("Respostas apagadas deste navegador")});
-  try{if(sessionStorage.getItem("swot-ep-fac")==="1"){liberar()}}catch(e){}
+
 }
 init();
+
+try{document.querySelector('link[rel=icon]').href=document.querySelector('.brand img').src}catch(e){}
 
 </script>
 </body>
