@@ -176,7 +176,8 @@ td.q{font:700 12px var(--f-mono)}
           <div class="stat"><small>Aderência de participação</small><b id="st-ader">—</b></div>
           <div class="stat"><small>Itens avaliados</small><b>81</b></div>
         </div>
-        <div class="actions"><button class="primary" id="baixar" type="button">Baixar Excel</button><button class="ghost" id="atualizar" type="button">Atualizar</button><span class="hint" id="xls-status" role="status"></span></div>
+        <div class="actions"><button class="primary" id="baixar" type="button">Baixar Excel</button><button class="ghost" id="atualizar" type="button">Atualizar</button><button class="ghost" id="bots-gerar" type="button">Gerar respostas de teste (6 bots)</button><button class="ghost danger" id="bots-apagar" type="button">Apagar respostas de teste</button><span class="hint" id="xls-status" role="status"></span></div>
+        <p class="hint"><b>Teste do sistema:</b> "Gerar respostas de teste" grava 6 avaliações fictícias (Bot Teste 1 a 6) no banco, como se 6 pessoas tivessem respondido. Use para testar o Excel e a colagem na planilha de planejamento. Antes de liberar o link ao time, clique em "Apagar respostas de teste".</p>
         <p class="hint">O Excel traz, para cada quadrante (Forças, Fraquezas, Oportunidades e Ameaças), os itens ordenados pelo Σ GxUxT (soma de todos os participantes), do maior para o menor, com os 10 primeiros em tons de cinza (1º mais escuro), além da aba BASE GUT no layout da proposta, as notas de cada pessoa e a participação.</p>
       </section>
       <section class="panel">
@@ -357,6 +358,34 @@ $("#part-body").addEventListener("click",async e=>{
   try{const res=await chamar({acao:"gut_remover",senha:senhaSessao,m:p.m,n:p.n});
     if(res.ok){toast("Avaliação removida.");atualizar()}else{toast("Não foi possível remover.");b.disabled=false}}
   catch(x){toast("Sem conexão.");b.disabled=false}
+});
+
+
+/* ---------------- respostas de teste (bots) ---------------- */
+const ehBot=p=>/^BOT\d+$/.test(p.m)&&/^Bot Teste \d+$/.test(p.n);
+$("#bots-gerar").addEventListener("click",async function(){
+  const s=$("#xls-status");this.disabled=true;
+  try{
+    for(let b=1;b<=6;b++){
+      s.textContent=`Gravando resposta de teste ${b} de 6…`;
+      /* cada item tem um peso fixo e cada bot varia um pouco em torno dele, para o ranking ficar parecido com um resultado real */
+      const v=[];for(let i=0;i<N;i++){const peso=1+((i*7+3)%5);for(let k=0;k<3;k++)v.push(Math.min(5,Math.max(1,peso+Math.floor(Math.random()*3)-1)))}
+      const res=await chamar({acao:"gut_salvar",m:"BOT"+b,n:"Bot Teste "+b,t:new Date().toISOString(),v:v.join("")});
+      if(!res||!res.ok)throw new Error(res&&res.erro||"erro");
+    }
+    s.textContent="6 respostas de teste gravadas.";await atualizar();
+  }catch(e){s.textContent="Não foi possível gravar as respostas de teste. Tente de novo."}
+  finally{this.disabled=false}
+});
+$("#bots-apagar").addEventListener("click",async function(){
+  const s=$("#xls-status");const bots=parts.filter(ehBot);
+  if(!bots.length){s.textContent="Não há respostas de teste no banco (clique em Atualizar se acabou de gerar).";return}
+  if(this.dataset.c!=="1"){this.dataset.c="1";this.textContent=`Confirmar: apagar ${bots.length} resposta(s) de teste`;return}
+  this.dataset.c="";this.textContent="Apagar respostas de teste";this.disabled=true;
+  try{for(const p of bots){s.textContent=`Apagando ${p.n}…`;await chamar({acao:"gut_remover",senha:senhaSessao,m:p.m,n:p.n})}
+    s.textContent="Respostas de teste apagadas.";await atualizar();}
+  catch(e){s.textContent="Não foi possível apagar todas. Tente de novo."}
+  finally{this.disabled=false}
 });
 
 /* ---------------- Excel ---------------- */
