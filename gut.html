@@ -177,11 +177,11 @@ td.q{font:700 12px var(--f-mono)}
           <div class="stat"><small>Itens avaliados</small><b>72</b></div>
         </div>
         <div class="actions"><button class="primary" id="baixar" type="button">Baixar Excel</button><button class="ghost" id="atualizar" type="button">Atualizar</button><span class="hint" id="xls-status" role="status"></span></div>
-        <p class="hint">O Excel traz o ranking por Σ GxUxT (soma de todos os participantes), do maior para o menor, com os 10 primeiros pintados de cinza, além da aba BASE GUT no layout da proposta, as notas de cada pessoa e a participação.</p>
+        <p class="hint">O Excel traz, para cada quadrante (Forças, Fraquezas, Oportunidades e Ameaças), os itens ordenados pelo Σ GxUxT (soma de todos os participantes), do maior para o menor, com os 10 primeiros em tons de cinza (1º mais escuro), além da aba BASE GUT no layout da proposta, as notas de cada pessoa e a participação.</p>
       </section>
       <section class="panel">
-        <h2>Top 10 da SWOT</h2>
-        <div class="tablebox"><table><thead><tr><th>#</th><th>Item</th><th>Σ GxUxT</th><th>Média</th><th>Avaliações</th></tr></thead><tbody id="top-body"></tbody></table></div>
+        <h2>Top 10 por quadrante</h2>
+        <div id="top-quads" class="wrap" style="gap:12px"></div>
       </section>
       <section class="panel">
         <h2>Participantes</h2>
@@ -330,20 +330,24 @@ async function atualizar(){
     renderFac();
   }catch(e){s.textContent=e&&e.message==="sem-endpoint"?"O banco de respostas ainda não foi configurado.":"Sem conexão com o banco de respostas. Tente de novo."}
 }
+const CINZAS=[...Array(10)].map((_,k)=>{const v=Math.round(0x8C+(0xEE-0x8C)*k/9).toString(16).toUpperCase().padStart(2,"0");return v+v+v});
 function calcular(){
   const r=ITENS.map((x,i)=>{let soma=0,cnt=0,g=0,u=0,t=0;
     for(const p of parts){const a=p.v[i*3],b=p.v[i*3+1],c=p.v[i*3+2];if(a&&b&&c){soma+=a*b*c;cnt++;g+=a;u+=b;t+=c}}
     return {...x,i,soma,cnt,g:cnt?g/cnt:0,u:cnt?u/cnt:0,tn:cnt?t/cnt:0,media:cnt?soma/cnt:0}});
-  const ord=[...r].sort((a,b)=>b.soma-a.soma||b.media-a.media||a.i-b.i);
+  const cmp=(a,b)=>b.soma-a.soma||b.media-a.media||a.i-b.i;
+  const ord=[...r].sort(cmp);
   ord.forEach((x,k)=>x.pos=k+1);
-  return {r,ord};
+  const porQ={};
+  for(const q of "SWOT"){porQ[q]=r.filter(x=>x.q===q).sort(cmp);porQ[q].forEach((x,k)=>x.pq=k+1)}
+  return {r,ord,porQ};
 }
 function renderFac(){
   const np=parts.length,tt=tamTime();
   $("#st-part").textContent=np;
   $("#st-ader").textContent=tt?Math.round(np/tt*100)+"%":"—";
-  const {ord}=calcular();
-  $("#top-body").innerHTML=np?ord.slice(0,10).map(x=>`<tr class="top"><td class="n">${x.pos}</td><td><span class="code" style="--qc:var(${Q[x.q].c});--qbg:var(${Q[x.q].bg})">${x.c}</span> ${esc(x.t)}</td><td class="n">${x.soma}</td><td class="n">${x.media.toFixed(1).replace(".",",")}</td><td class="n">${x.cnt}</td></tr>`).join(""):`<tr><td colspan="5" class="empty">Nenhuma avaliação recebida ainda.</td></tr>`;
+  const {porQ}=calcular();
+  $("#top-quads").innerHTML=np?[..."SWOT"].map(q=>`<h3 style="color:var(${Q[q].c})">${q} · ${Q[q].nome}</h3><div class="tablebox"><table><thead><tr><th>#</th><th>Item</th><th>Σ GxUxT</th><th>Média</th><th>Avaliações</th></tr></thead><tbody>${porQ[q].slice(0,10).map((x,k)=>`<tr><td class="n" style="background:#${CINZAS[k]};color:#16202E">${x.pq}</td><td style="background:#${CINZAS[k]};color:#16202E"><b>${x.c}</b> ${esc(x.t)}</td><td class="n" style="background:#${CINZAS[k]};color:#16202E">${x.soma}</td><td class="n" style="background:#${CINZAS[k]};color:#16202E">${x.media.toFixed(1).replace(".",",")}</td><td class="n" style="background:#${CINZAS[k]};color:#16202E">${x.cnt}</td></tr>`).join("")}</tbody></table></div>`).join(""):`<p class="empty">Nenhuma avaliação recebida ainda.</p>`;
   $("#part-body").innerHTML=np?parts.map((p,k)=>`<tr><td>${esc(p.m)}</td><td>${esc(p.n)}</td><td>${esc(fmtData(p.h))}</td><td class="n">${p.v.reduce((a,b)=>a+b,0)}</td><td><button class="ghost" type="button" data-rm="${k}">Remover</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">Ninguém enviou ainda.</td></tr>`;
 }
 $("#part-body").addEventListener("click",async e=>{
@@ -374,41 +378,48 @@ $("#baixar").addEventListener("click",async()=>{
   }catch(e){console.error(e);s.textContent="Não foi possível gerar a planilha (verifique a conexão)."}
 });
 async function gerarExcel(){
-  const {r,ord}=calcular();const np=parts.length,tt=tamTime()||np;
+  const {r,porQ}=calcular();const np=parts.length,tt=tamTime()||np;
   const wb=new ExcelJS.Workbook();wb.creator="Engenharia Packaging";wb.created=new Date();
-  const CINZA={type:"pattern",pattern:"solid",fgColor:{argb:"FFD9D9D9"}};
+  const cinza=k=>({type:"pattern",pattern:"solid",fgColor:{argb:"FF"+CINZAS[k]}});
   const NAVY={type:"pattern",pattern:"solid",fgColor:{argb:"FF12284C"}};
-  const QF={S:"FFEAF4EA",W:"FFFBEFDF",O:"FFE5EFFB",T:"FFFBE8E8"};
+  const QC={S:"FF2E7D32",W:"FFB85F00",O:"FF1565C0",T:"FFC62828"};
   const borda={top:{style:"thin",color:{argb:"FFBFBFBF"}},left:{style:"thin",color:{argb:"FFBFBFBF"}},bottom:{style:"thin",color:{argb:"FFBFBFBF"}},right:{style:"thin",color:{argb:"FFBFBFBF"}}};
   const hdr=(row)=>row.eachCell(c=>{c.fill=NAVY;c.font={bold:true,color:{argb:"FFFFFFFF"}};c.alignment={vertical:"middle",horizontal:"center",wrapText:true};c.border=borda});
   const agora=fmtData(new Date().toISOString());
+  const NOMEQ={S:"FORÇAS",W:"FRAQUEZAS",O:"OPORTUNIDADES",T:"AMEAÇAS"};
 
-  /* 1) Ranking GUT */
-  const ws=wb.addWorksheet("Ranking GUT",{views:[{state:"frozen",ySplit:6}]});
-  ws.columns=[{width:9},{width:9},{width:15},{width:78},{width:12},{width:12},{width:12},{width:10},{width:10},{width:10},{width:13}];
-  ws.mergeCells("A1:K1");ws.getCell("A1").value="MATRIZ GUT · SWOT ENGENHARIA PACKAGING 2027 · RESULTADO ACUMULADO";
+  /* 1) Ranking GUT: um bloco por quadrante, do maior para o menor Σ GxUxT */
+  const ws=wb.addWorksheet("Ranking GUT",{views:[{state:"frozen",ySplit:4}]});
+  ws.columns=[{width:10},{width:9},{width:80},{width:12},{width:12},{width:12},{width:10},{width:10},{width:10},{width:13}];
+  ws.mergeCells("A1:J1");ws.getCell("A1").value="MATRIZ GUT · SWOT ENGENHARIA PACKAGING 2027 · RESULTADO ACUMULADO POR QUADRANTE";
   ws.getCell("A1").font={bold:true,size:14,color:{argb:"FF12284C"}};
-  ws.mergeCells("A2:K2");ws.getCell("A2").value=`Gerado em ${agora}. Ordenado pelo Σ GxUxT (soma de todos os participantes), do maior para o menor. Os 10 primeiros estão em cinza.`;
-  ws.getCell("A2").font={italic:true,color:{argb:"FF5B6878"}};
-  ws.getCell("A3").value="Pessoas no time";ws.getCell("C3").value=tt;
+  ws.mergeCells("A2:J2");ws.getCell("A2").value=`Gerado em ${agora}. Em cada quadrante, os itens estão ordenados pelo Σ GxUxT (soma de todos os participantes), do maior para o menor. Os 10 primeiros de cada quadrante estão em tons de cinza: o 1º mais escuro e o 10º mais claro.`;
+  ws.getCell("A2").font={italic:true,color:{argb:"FF5B6878"}};ws.getCell("A2").alignment={wrapText:true,vertical:"top"};ws.getRow(2).height=30;
+  ws.getCell("A3").value="Pessoas no time";ws.getCell("B3").value=tt;
   ws.getCell("D3").value="Participantes";ws.getCell("E3").value=np;
-  ws.getCell("F3").value="Aderência";ws.getCell("G3").value={formula:"IFERROR(E3/C3,0)",result:tt?np/tt:0};ws.getCell("G3").numFmt="0%";
+  ws.getCell("F3").value="Aderência";ws.getCell("G3").value={formula:"IFERROR(E3/B3,0)",result:tt?np/tt:0};ws.getCell("G3").numFmt="0%";
   ["A3","D3","F3"].forEach(a=>ws.getCell(a).font={bold:true});
-  ["C3","E3","G3"].forEach(a=>{ws.getCell(a).font={bold:true,size:12};ws.getCell(a).border=borda;ws.getCell(a).alignment={horizontal:"center"}});
-  ws.getCell("H3").value="← altere o tamanho do time em C3 e a aderência se recalcula";ws.getCell("H3").font={italic:true,size:9,color:{argb:"FF5B6878"}};
-  ws.getRow(6).values=["Posição","Código","Quadrante","Item","Σ GxUxT","Avaliações","Aderência","Média G","Média U","Média T","Média GxUxT"];
-  hdr(ws.getRow(6));ws.getRow(6).height=30;
-  ord.forEach((x,k)=>{
-    const rr=7+k;const row=ws.getRow(rr);
-    row.values=[x.pos,x.c,Q[x.q].sing,x.t,x.soma,x.cnt,{formula:`IFERROR(F${rr}/$C$3,0)`,result:tt?x.cnt/tt:0},x.g,x.u,x.tn,{formula:`IFERROR(E${rr}/F${rr},0)`,result:x.media}];
-    row.getCell(7).numFmt="0%";[8,9,10].forEach(c=>row.getCell(c).numFmt="0.0");row.getCell(11).numFmt="0.0";
-    row.eachCell({includeEmpty:true},(c,ci)=>{if(ci>11)return;c.border=borda;c.alignment={vertical:"middle",wrapText:ci===4,horizontal:ci===4?"left":"center"};if(k<10)c.fill=CINZA});
-    if(k>=10)row.getCell(3).fill={type:"pattern",pattern:"solid",fgColor:{argb:QF[x.q]}};
-    if(k<10)row.eachCell(c=>c.font={bold:true});
-  });
-  ws.autoFilter={from:"A6",to:`K${6+ord.length}`};
+  ["B3","E3","G3"].forEach(a=>{ws.getCell(a).font={bold:true,size:12};ws.getCell(a).border=borda;ws.getCell(a).alignment={horizontal:"center"}});
+  ws.getCell("H3").value="← altere o tamanho do time em B3 e a aderência se recalcula";ws.getCell("H3").font={italic:true,size:9,color:{argb:"FF5B6878"}};
+  let rr=5;
+  for(const q of "SWOT"){
+    ws.mergeCells(`A${rr}:J${rr}`);const t=ws.getCell(`A${rr}`);
+    t.value=`${q} · ${NOMEQ[q]} (${porQ[q].length} itens)`;t.font={bold:true,size:13,color:{argb:"FFFFFFFF"}};
+    t.fill={type:"pattern",pattern:"solid",fgColor:{argb:QC[q]}};t.alignment={vertical:"middle"};ws.getRow(rr).height=22;rr++;
+    ws.getRow(rr).values=["Posição","Código","Item","Σ GxUxT","Avaliações","Aderência","Média G","Média U","Média T","Média GxUxT"];
+    hdr(ws.getRow(rr));ws.getRow(rr).height=30;rr++;
+    porQ[q].forEach((x,k)=>{
+      const row=ws.getRow(rr);
+      row.values=[x.pq,x.c,x.t,x.soma,x.cnt,{formula:`IFERROR(E${rr}/$B$3,0)`,result:tt?x.cnt/tt:0},x.g,x.u,x.tn,{formula:`IFERROR(D${rr}/E${rr},0)`,result:x.media}];
+      row.getCell(6).numFmt="0%";[7,8,9,10].forEach(c=>row.getCell(c).numFmt="0.0");
+      for(let ci=1;ci<=10;ci++){const c=row.getCell(ci);c.border=borda;c.alignment={vertical:"middle",wrapText:ci===3,horizontal:ci===3?"left":"center"};
+        if(k<10){c.fill=cinza(k);c.font={bold:true}}}
+      rr++;
+    });
+    rr++;
+  }
 
-  /* 2) BASE GUT (layout da proposta) */
+  /* 2) BASE GUT (layout da proposta, cada seção ordenada do maior para o menor) */
   const wbg=wb.addWorksheet("BASE GUT",{views:[{state:"frozen",ySplit:1}]});
   wbg.columns=[{width:100},{width:16},{width:16},{width:16},{width:12},{width:12},{width:12},{width:12}];
   const defs=["Gravidade ( Mede o impacto do problema ou ação caso ele ocorra ou persista, avaliando as consequências negativas para a empresa, processo ou pessoas)",
@@ -416,18 +427,19 @@ async function gerarExcel(){
     "Tendência (Avalia a probabilidade de agravamento do problema ao longo do tempo, caso nenhuma ação seja tomada, ou a possibilidade de redução ou desaparecimento do problema)"];
   const secs={S:[1,"Fortaleza"],W:[25,"Fraqueza"],O:[54,"Oportunidade"],T:[63,"Ameaça"]};
   for(const q of "SWOT"){const [hr,nm]=secs[q];const row=wbg.getRow(hr);
-    row.values=[nm,...(hr===1?defs:["Gravidade (média)","Urgência (média)","Tendência (média)"]),"GxUxT (Σ)","Avaliações","Aderência","Posição"];
-    hdr(row);row.getCell(1).alignment={vertical:"middle",horizontal:"left"};row.height=hr===1?120:30;}
-  wbg.getRow(1).getCell(2).note="Nas linhas de itens: média das notas do time (1 a 5).";
-  for(const x of r){const row=wbg.getRow(x.r);
-    row.getCell(1).value=x.t;
-    row.getCell(2).value=+x.g.toFixed(2);row.getCell(3).value=+x.u.toFixed(2);row.getCell(4).value=+x.tn.toFixed(2);
-    row.getCell(5).value=x.soma;row.getCell(6).value=x.cnt;
-    row.getCell(7).value={formula:`IFERROR(F${x.r}/'Ranking GUT'!$C$3,0)`,result:tt?x.cnt/tt:0};row.getCell(7).numFmt="0%";
-    row.getCell(8).value=x.pos;
-    [2,3,4].forEach(c=>row.getCell(c).numFmt="0.0");
-    row.eachCell({includeEmpty:true},(c,ci)=>{if(ci>8)return;c.border=borda;c.alignment={vertical:"middle",wrapText:ci===1,horizontal:ci===1?"left":"center"};if(x.pos<=10){c.fill=CINZA;c.font={bold:true}}});
+    row.values=[nm,...(hr===1?defs:["Gravidade (média)","Urgência (média)","Tendência (média)"]),"GxUxT (Σ)","Avaliações","Aderência","Posição no quadrante"];
+    hdr(row);row.getCell(1).alignment={vertical:"middle",horizontal:"left"};row.height=hr===1?120:30;
+    porQ[q].forEach((x,k)=>{const lr=hr+1+k;const rw=wbg.getRow(lr);
+      rw.getCell(1).value=x.t;
+      rw.getCell(2).value=+x.g.toFixed(2);rw.getCell(3).value=+x.u.toFixed(2);rw.getCell(4).value=+x.tn.toFixed(2);
+      rw.getCell(5).value=x.soma;rw.getCell(6).value=x.cnt;
+      rw.getCell(7).value={formula:`IFERROR(F${lr}/'Ranking GUT'!$B$3,0)`,result:tt?x.cnt/tt:0};rw.getCell(7).numFmt="0%";
+      rw.getCell(8).value=x.pq;
+      [2,3,4].forEach(c=>rw.getCell(c).numFmt="0.0");
+      for(let ci=1;ci<=8;ci++){const c=rw.getCell(ci);c.border=borda;c.alignment={vertical:"middle",wrapText:ci===1,horizontal:ci===1?"left":"center"};if(k<10){c.fill=cinza(k);c.font={bold:true}}}
+    });
   }
+  wbg.getRow(1).getCell(2).note="Nas linhas de itens: média das notas do time (1 a 5). Cada seção está ordenada pelo GxUxT (Σ), do maior para o menor; os 10 primeiros em tons de cinza (1º mais escuro).";
 
   /* 3) Respostas (uma linha por pessoa e item) */
   const wr=wb.addWorksheet("Respostas",{views:[{state:"frozen",ySplit:1}]});
