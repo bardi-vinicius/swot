@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Matriz GUT · SWOT Engenharia Packaging</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#F3F5F8; --paper:#FFFFFF; --ink:#16202E; --muted:#5B6878; --line:#D5DCE5; --soft:#E9EDF2;
+  --navy:#12284C; --navy-ink:#FFFFFF; --focus:#2F6FDB;
+  --s:#2E7D32; --s-bg:#EAF4EA; --w:#B85F00; --w-bg:#FBEFDF; --o:#1565C0; --o-bg:#E5EFFB; --t:#C62828; --t-bg:#FBE8E8;
+  --warn-bg:#FFF6D6; --warn-ink:#6B5100; --ok:#2E7D32; --top:#D9D9D9;
+  --f-display:"Archivo","Arial Narrow",Arial,sans-serif; --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F151E; --paper:#18212D; --ink:#E6EBF2; --muted:#9AA7B8; --line:#2D3A4B; --soft:#202B39;
+  --navy:#9CC3FF; --navy-ink:#0F151E; --focus:#7FB0FF;
+  --s:#7CC883; --s-bg:#1C2E1F; --w:#F0A657; --w-bg:#33261A; --o:#7DB4F5; --o-bg:#182A40; --t:#F08A8A; --t-bg:#3A1E21;
+  --warn-bg:#3A3215; --warn-ink:#F2D98A; --ok:#7CC883; --top:#3A4250; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F151E; --paper:#18212D; --ink:#E6EBF2; --muted:#9AA7B8; --line:#2D3A4B; --soft:#202B39;
+  --navy:#9CC3FF; --navy-ink:#0F151E; --focus:#7FB0FF;
+  --s:#7CC883; --s-bg:#1C2E1F; --w:#F0A657; --w-bg:#33261A; --o:#7DB4F5; --o-bg:#182A40; --t:#F08A8A; --t-bg:#3A1E21;
+  --warn-bg:#3A3215; --warn-ink:#F2D98A; --ok:#7CC883; --top:#3A4250; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);padding:0 16px 64px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:24px;font-weight:700}
+h3{font-size:15px;font-weight:700;font-stretch:90%;letter-spacing:.02em}
+p{margin:0}
+.eyebrow{font:600 11px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+header.top{padding-block:28px 4px;display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;align-items:center;gap:16px}
+.brand img{width:84px;height:84px;border-radius:50%;flex:none;box-shadow:0 0 0 1px var(--line)}
+@media (max-width:520px){.brand{gap:12px}.brand img{width:64px;height:64px}}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--navy);color:var(--navy-ink);border-color:var(--navy)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.lead{font-size:16px;max-width:68ch}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.defs > div{background:var(--soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.defs b.k{font:800 26px/1 var(--f-display);font-stretch:80%;color:var(--navy)}
+.defs p{font-size:13.5px}
+.defs ol{margin:0;padding:0;list-style:none;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.defs ol span{display:inline-block;width:20px;font:600 12px var(--f-mono)}
+.formula{font:600 13px var(--f-mono);background:var(--soft);border-radius:8px;padding:10px 14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;min-width:0}
+input[type=text],input[type=password],input[type=number]{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:9px 11px;width:100%;min-width:0}
+.counter{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);padding:10px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font:600 12.5px var(--f-mono);text-decoration:none;border:1px solid transparent}
+.chip.done{border-color:currentColor}
+.counter .spacer{flex:1}
+.qS{background:var(--s-bg);color:var(--s)} .qW{background:var(--w-bg);color:var(--w)} .qO{background:var(--o-bg);color:var(--o)} .qT{background:var(--t-bg);color:var(--t)}
+.quad{border-left:6px solid var(--qc)}
+.quad .head{display:flex;gap:14px;align-items:flex-start}
+.letter{font:800 46px/0.9 var(--f-display);font-stretch:75%;color:var(--qc)}
+.tag{display:inline-block;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--qc);background:var(--qbg);border-radius:4px;padding:2px 7px;margin-top:6px}
+.hint{font-size:13.5px;color:var(--muted)}
+.items{display:flex;flex-direction:column;gap:10px}
+.gi{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.gi.ok{border-color:color-mix(in srgb,var(--qc) 55%,var(--line))}
+.gi.miss{border-color:var(--t);box-shadow:0 0 0 1px var(--t)}
+.gi .tx{display:flex;gap:10px;align-items:flex-start}
+.code{font:600 13px var(--f-mono);color:var(--qc);background:var(--qbg);border-radius:5px;padding:3px 7px;flex:none}
+.gi .tx p{font-size:14.5px;font-weight:500}
+.gsc{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.grp{display:flex;align-items:center;gap:5px}
+.grp > b{font:700 13px var(--f-mono);width:16px;color:var(--muted)}
+.grp button{width:34px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--paper);font:600 14px var(--f-mono);cursor:pointer}
+.grp button[aria-pressed="true"]{background:var(--qc);border-color:var(--qc);color:var(--paper)}
+.res{margin-left:auto;font:600 13px var(--f-mono);color:var(--muted);white-space:nowrap}
+.res b{font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.res{margin-left:0;width:100%}.grp button{width:32px;height:32px}.panel{padding:16px}.letter{font-size:36px}}
+.err{color:var(--t);font-size:12.5px;font-weight:600}
+.primary{background:var(--navy);color:var(--navy-ink);border:none;border-radius:8px;padding:12px 22px;font-weight:700;font-size:15px;cursor:pointer}
+.primary[disabled]{opacity:.5;cursor:wait}
+.ghost{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:9px 14px;font-weight:600;font-size:13.5px;cursor:pointer}
+.ghost.danger{color:var(--t);border-color:var(--t)}
+.notice{border-radius:8px;padding:12px 14px;font-size:14px;background:var(--warn-bg);color:var(--warn-ink)}
+.notice.ok{background:var(--s-bg);color:var(--s)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.stat b{display:block;font:800 30px/1.1 var(--f-display);font-stretch:85%;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted);font-size:12px}
+.stat input{max-width:110px;padding:6px 8px}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:640px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
+td.n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.top td{background:var(--top)}
+td.q{font:700 12px var(--f-mono)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+.empty{color:var(--muted);font-size:14px;padding:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Planejamento estratégico · Engenharia Packaging · Ciclo 2027</span>
+    <div class="brand"><img src="data:image/jpeg;base64,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" alt="Emblema Engenharia Packaging – Cervejaria Rio de Janeiro" width="84" height="84"><h1>Matriz GUT da SWOT Engenharia Packaging</h1></div>
+    <div class="tabs">
+      <button class="tab" id="tab-form" aria-selected="true" type="button">Avaliar</button>
+      <button class="tab" id="tab-fac" aria-selected="false" type="button">Painel do facilitador</button>
+    </div>
+  </header>
+
+  <main id="view-form" class="wrap">
+    <section class="panel" aria-labelledby="t-intro">
+      <h2 id="t-intro">Priorização GUT das respostas da SWOT</h2>
+      <p class="lead">Reunimos todas as respostas do time na análise SWOT: <b>22 forças</b>, <b>27 fraquezas</b>, <b>7 oportunidades</b> e <b>16 ameaças</b>. Agora cada pessoa dá uma nota de <b>1 a 5</b> em Gravidade, Urgência e Tendência para cada item. A soma das notas de todo o time define as prioridades do plano 2027.</p>
+      <div class="defs">
+        <div><b class="k">G · Gravidade</b><p>Mede o impacto do problema ou ação caso ele ocorra ou persista, avaliando as consequências negativas para a empresa, processo ou pessoas.</p>
+          <ol><li><span>1</span>Sem gravidade</li><li><span>2</span>Pouco grave</li><li><span>3</span>Grave</li><li><span>4</span>Muito grave</li><li><span>5</span>Extremamente grave</li></ol></div>
+        <div><b class="k">U · Urgência</b><p>Indica o tempo disponível para resolver o problema ou executar a ação; quanto mais urgente, menor o prazo.</p>
+          <ol><li><span>1</span>Pode esperar</li><li><span>2</span>Pouco urgente</li><li><span>3</span>O mais rápido possível</li><li><span>4</span>Urgente</li><li><span>5</span>Ação imediata</li></ol></div>
+        <div><b class="k">T · Tendência</b><p>Avalia a probabilidade de agravamento do problema ao longo do tempo, caso nenhuma ação seja tomada, ou a possibilidade de redução ou desaparecimento do problema.</p>
+          <ol><li><span>1</span>Não vai mudar / tende a sumir</li><li><span>2</span>Piora a longo prazo</li><li><span>3</span>Piora a médio prazo</li><li><span>4</span>Piora a curto prazo</li><li><span>5</span>Piora rapidamente</li></ol></div>
+      </div>
+      <p class="formula">GxUxT = Gravidade × Urgência × Tendência &nbsp;·&nbsp; de 1 (mínimo) a 125 (máximo) por item</p>
+      <h3>Antes de começar</h3>
+      <ul class="steps">
+        <li>Leva de 15 a 20 minutos. São <b>72 itens</b> e todos precisam das três notas.</li>
+        <li>Em <b>Forças</b> e <b>Oportunidades</b>, pense no impacto de aproveitar (ou de perder) aquele ponto: quanto pesa, quanto tempo temos e se tende a crescer ou se perder.</li>
+        <li>Suas notas ficam salvas neste aparelho enquanto você responde. Pode fechar e voltar depois para terminar.</li>
+        <li><b>Reenvio:</b> se você enviar de novo usando o mesmo ID e nome, sua avaliação anterior é substituída pela nova (não fica duplicada).</li>
+        <li>Para qualquer informação extra, procure o <b>Bardi</b>.</li>
+      </ul>
+    </section>
+    <section class="panel" aria-labelledby="t-id">
+      <h2 id="t-id" tabindex="-1">Identificação</h2>
+      <p class="hint">Seu nome aparece somente para o facilitador (Bardi), para contar a participação.</p>
+      <div class="grid2">
+        <label class="f" for="matricula">ID<input type="text" id="matricula" autocomplete="off" placeholder="Seu ID"></label>
+        <label class="f" for="nome">Nome<input type="text" id="nome" autocomplete="name" placeholder="Seu nome"></label>
+      </div>
+      <p class="err" id="err-id" hidden></p>
+    </section>
+    <nav class="counter" id="counter" aria-label="Progresso por quadrante"></nav>
+    <div id="quads" class="wrap"></div>
+    <section class="panel" aria-labelledby="t-env">
+      <h2 id="t-env">Enviar avaliação</h2>
+      <p class="hint" id="env-resumo"></p>
+      <div class="actions"><button class="primary" id="enviar" type="button">Enviar avaliação</button><button class="ghost" id="limpar" type="button">Limpar minhas notas</button></div>
+      <div id="env-msg" role="status"></div>
+    </section>
+  </main>
+
+  <main id="view-fac" class="wrap" hidden>
+    <section class="panel" id="lock">
+      <h2>Acesso do facilitador</h2>
+      <form id="lock-form" class="actions">
+        <label class="f" for="senha" style="flex:1 1 220px">Senha<input type="password" id="senha" autocomplete="current-password"></label>
+        <button class="primary" type="submit" style="align-self:flex-end">Entrar</button>
+      </form>
+      <p class="err" id="err-senha" hidden></p>
+    </section>
+    <div id="fac-body" class="wrap" hidden>
+      <section class="panel">
+        <div class="actions" style="justify-content:space-between"><h2>Resultado acumulado</h2><span class="hint" id="srv-status"></span></div>
+        <div class="stats">
+          <div class="stat"><small>Participantes</small><b id="st-part">0</b></div>
+          <label class="stat" for="time"><small>Pessoas no time</small><input type="number" id="time" min="1" step="1" placeholder="Ex.: 25"></label>
+          <div class="stat"><small>Aderência de participação</small><b id="st-ader">—</b></div>
+          <div class="stat"><small>Itens avaliados</small><b>72</b></div>
+        </div>
+        <div class="actions"><button class="primary" id="baixar" type="button">Baixar Excel</button><button class="ghost" id="atualizar" type="button">Atualizar</button><span class="hint" id="xls-status" role="status"></span></div>
+        <p class="hint">O Excel traz o ranking por Σ GxUxT (soma de todos os participantes), do maior para o menor, com os 10 primeiros pintados de cinza, além da aba BASE GUT no layout da proposta, as notas de cada pessoa e a participação.</p>
+      </section>
+      <section class="panel">
+        <h2>Top 10 da SWOT</h2>
+        <div class="tablebox"><table><thead><tr><th>#</th><th>Item</th><th>Σ GxUxT</th><th>Média</th><th>Avaliações</th></tr></thead><tbody id="top-body"></tbody></table></div>
+      </section>
+      <section class="panel">
+        <h2>Participantes</h2>
+        <div class="tablebox"><table><thead><tr><th>ID</th><th>Nome</th><th>Enviado em</th><th>Σ das notas</th><th></th></tr></thead><tbody id="part-body"></tbody></table></div>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script>
+let ENDPOINT = "";
+const carregarEndpoint = fetch("endpoint.txt",{cache:"no-store"}).then(r=>r.ok?r.text():"").then(t=>{t=(t||"").trim();if(/^https:\/\/script\.google\.com\//.test(t))ENDPOINT=t}).catch(()=>{});
+const SENHA_HASH = "614c1d9e9dee8919b3f9663d0866821ef232f53ce6b1ea70083d2d02d72c6f75";
+const ITENS = [{"c": "S01", "q": "S", "t": "Time técnico capacitado para solução de passivos de segurança.", "r": 2}, {"c": "S02", "q": "S", "t": "Boa gestão dos indicadores de saúde do planejamento (P3M / out P3M / preditiva).", "r": 3}, {"c": "S03", "q": "S", "t": "Conhecimento técnico dos equipamentos.", "r": 4}, {"c": "S04", "q": "S", "t": "Controle e distribuição da informação sobre os KPIs de manutenção.", "r": 5}, {"c": "S05", "q": "S", "t": "Domínio dos relatos do Guardian, tratando-os de forma imediata quando possível.", "r": 6}, {"c": "S06", "q": "S", "t": "Boa estrutura para suporte nas manutenções em transporte na retornável.", "r": 7}, {"c": "S07", "q": "S", "t": "Conhecimento técnico dos equipamentos da linha.", "r": 8}, {"c": "S08", "q": "S", "t": "Cooperação entre equipes.", "r": 9}, {"c": "S09", "q": "S", "t": "Tempo de casa operacional.", "r": 10}, {"c": "S10", "q": "S", "t": "Conhecimento técnico dos funcionários mais antigos, podendo disseminar para os novos.", "r": 11}, {"c": "S11", "q": "S", "t": "Boa estratégia de capacitação do time técnico elétrico / mecânico.", "r": 12}, {"c": "S12", "q": "S", "t": "Clareza nos direcionamentos passados para cumprimento da rotina.", "r": 13}, {"c": "S13", "q": "S", "t": "União da equipe de planejamento.", "r": 14}, {"c": "S14", "q": "S", "t": "Participação dos técnicos preventivos nos treinamentos de normas.", "r": 15}, {"c": "S15", "q": "S", "t": "Bom planejamento das ordens de manutenção em transportadores.", "r": 16}, {"c": "S16", "q": "S", "t": "Experiência do time da preventiva na resolução de falhas.", "r": 17}, {"c": "S17", "q": "S", "t": "Facilidade para identificação das anomalias com os técnicos mais experientes.", "r": 18}, {"c": "S18", "q": "S", "t": "Time da RET com bom conhecimento técnico em transportadores.", "r": 19}, {"c": "S19", "q": "S", "t": "Cooperação dos técnicos da preventiva em soluções das anomalias.", "r": 20}, {"c": "S20", "q": "S", "t": "Oficina central – centro de manufatura (usinagem de peças).", "r": 21}, {"c": "S21", "q": "S", "t": "Sinergia entre técnicos das linhas.", "r": 22}, {"c": "S22", "q": "S", "t": "Baixa demanda de vasilhame gerando oportunidade de manutenção na L501.", "r": 23}, {"c": "W01", "q": "W", "t": "Falha na gestão de indicadores de manutenção, sem geração de valor e de ações.", "r": 26}, {"c": "W02", "q": "W", "t": "Baixa utilização de ferramentas para melhorar a gestão e aumentar a produtividade.", "r": 27}, {"c": "W03", "q": "W", "t": "Conhecimento técnico e capacidade de trabalho pulverizados.", "r": 28}, {"c": "W04", "q": "W", "t": "Falha na abertura de ordens pelos técnicos e operadores.", "r": 29}, {"c": "W05", "q": "W", "t": "Relatos do Guardian não tratados imediatamente têm tempo de tratamento muito longo por falta de acompanhamento.", "r": 30}, {"c": "W06", "q": "W", "t": "Baixo conhecimento técnico no transporte da OW Refri.", "r": 31}, {"c": "W07", "q": "W", "t": "Recorrência de falhas sem eliminação definitiva da causa raiz.", "r": 32}, {"c": "W08", "q": "W", "t": "Baixa aderência às rotinas de acompanhamento dos indicadores de manutenção.", "r": 33}, {"c": "W09", "q": "W", "t": "Falta de mão de obra qualificada.", "r": 34}, {"c": "W10", "q": "W", "t": "Falha na gestão de peças e subconjuntos nas áreas.", "r": 35}, {"c": "W11", "q": "W", "t": "Alto tempo de PCM e demora nas partidas.", "r": 36}, {"c": "W12", "q": "W", "t": "Baixo sentimento de dono.", "r": 37}, {"c": "W13", "q": "W", "t": "Falha na rotina de confirmação de ordens.", "r": 38}, {"c": "W14", "q": "W", "t": "Gestão da sala de CIP.", "r": 39}, {"c": "W15", "q": "W", "t": "Time da OW ainda sem estrutura e recursos para cumprimento das atividades em transporte.", "r": 40}, {"c": "W16", "q": "W", "t": "Conhecimento específico concentrado em poucos técnicos.", "r": 41}, {"c": "W17", "q": "W", "t": "Falha no fechamento completo do ciclo (ações geradas no 5PQ).", "r": 42}, {"c": "W18", "q": "W", "t": "Falha na execução da rotina básica.", "r": 43}, {"c": "W19", "q": "W", "t": "Falha na gestão de oficinas – controles e território seguro.", "r": 44}, {"c": "W20", "q": "W", "t": "Falha no processo do plano de calibração e planos de qualidade.", "r": 45}, {"c": "W21", "q": "W", "t": "Alto número de retrabalhos nas atividades de PCM com o time de transportes.", "r": 46}, {"c": "W22", "q": "W", "t": "Alto backlog de manutenção.", "r": 47}, {"c": "W23", "q": "W", "t": "Falta de material no almoxarifado, de alto e baixo giro.", "r": 48}, {"c": "W24", "q": "W", "t": "Falha na gestão de custos (TM e OH).", "r": 49}, {"c": "W25", "q": "W", "t": "Impacto de custo de 2026 sendo refletido em 2027.", "r": 50}, {"c": "W26", "q": "W", "t": "Desbalanceamento de técnicos – escassez de técnicos mecânicos qualificados na cervejaria.", "r": 51}, {"c": "W27", "q": "W", "t": "Burocracia para aquisição de materiais e aprovação de RC.", "r": 52}, {"c": "O01", "q": "O", "t": "Aplicativo da AB InBev que irá substituir o LMS.", "r": 55}, {"c": "O02", "q": "O", "t": "Criar engenharia reversa de peças em 3D para confeccionar peças das EPCs internamente ou com serviços externos próximos.", "r": 56}, {"c": "O03", "q": "O", "t": "Capex para transportadores.", "r": 57}, {"c": "O04", "q": "O", "t": "Suporte técnico de fornecedores e especialistas.", "r": 58}, {"c": "O05", "q": "O", "t": "Criar internamente uma oficina para recuperação de motores (custo alto realizando externamente).", "r": 59}, {"c": "O06", "q": "O", "t": "Completar o QLP faltante das linhas.", "r": 60}, {"c": "O07", "q": "O", "t": "Capex para troca da sopradora SBO24.", "r": 61}, {"c": "T01", "q": "T", "t": "Lead time de materiais e dependência de fornecedor único para certos materiais.", "r": 64}, {"c": "T02", "q": "T", "t": "Aquecimento do mercado pode tirar HH especializado.", "r": 65}, {"c": "T03", "q": "T", "t": "Prazo de entrega de alguns fornecedores ultrapassa o P3M.", "r": 66}, {"c": "T04", "q": "T", "t": "Gestão fraca dos pedidos de peças para PCM: é preciso acompanhar melhor as ordens com peças no sistema.", "r": 67}, {"c": "T05", "q": "T", "t": "Perda do time de parceiros no próximo ano.", "r": 68}, {"c": "T06", "q": "T", "t": "Obsolescência de componentes eletrônicos.", "r": 69}, {"c": "T07", "q": "T", "t": "Longos prazos de entrega de componentes e peças importadas.", "r": 70}, {"c": "T08", "q": "T", "t": "Escassez de profissionais técnicos especializados no mercado.", "r": 71}, {"c": "T09", "q": "T", "t": "Cancelamento de pedidos ativos.", "r": 72}, {"c": "T10", "q": "T", "t": "Dependência de fornecedores exclusivos para componentes especializados/críticos.", "r": 73}, {"c": "T11", "q": "T", "t": "Baixo consumo de bebidas por causa de questões climáticas.", "r": 74}, {"c": "T12", "q": "T", "t": "Desligamento voluntário de técnicos.", "r": 75}, {"c": "T13", "q": "T", "t": "Incentivo / redução de QLP – técnicos e liderança.", "r": 76}, {"c": "T14", "q": "T", "t": "Aumento da demanda produtiva e redução das janelas de manutenção.", "r": 77}, {"c": "T15", "q": "T", "t": "Vazamento de telhado e falta de ar-condicionado nas linhas.", "r": 78}, {"c": "T16", "q": "T", "t": "Alteração de escalas CLT.", "r": 79}];
+const N = ITENS.length;
+const Q = {
+  S:{nome:"Forças",sing:"Força",amb:"Interno · positivo",c:"--s",bg:"--s-bg"},
+  W:{nome:"Fraquezas",sing:"Fraqueza",amb:"Interno · negativo",c:"--w",bg:"--w-bg"},
+  O:{nome:"Oportunidades",sing:"Oportunidade",amb:"Externo · positivo",c:"--o",bg:"--o-bg"},
+  T:{nome:"Ameaças",sing:"Ameaça",amb:"Externo · negativo",c:"--t",bg:"--t-bg"}
+};
+const LBL = {
+  G:["Sem gravidade","Pouco grave","Grave","Muito grave","Extremamente grave"],
+  U:["Pode esperar","Pouco urgente","O mais rápido possível","Urgente","Ação imediata"],
+  T:["Não vai mudar / tende a sumir","Piora a longo prazo","Piora a médio prazo","Piora a curto prazo","Piora rapidamente"]
+};
+const DIM = ["G","U","T"];
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = {get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,3200)}
+const fmtData = iso=>{const d=new Date(iso);if(isNaN(d))return String(iso||"");const p=n=>String(n).padStart(2,"0");return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`};
+
+/* ---------------- avaliação ---------------- */
+const RK = "gut-ep-rascunho";
+let st = store.get(RK) || {};
+if(!Array.isArray(st.v) || st.v.length!==N*3) st.v = new Array(N*3).fill(0);
+if(!st.t) st.t = new Date().toISOString();
+const salvar = ()=>store.set(RK,st);
+const completo = i=>st.v[i*3]&&st.v[i*3+1]&&st.v[i*3+2];
+
+function render(){
+  const box=$("#quads");box.innerHTML="";
+  for(const q of "SWOT"){
+    const its=ITENS.map((x,i)=>[x,i]).filter(([x])=>x.q===q);
+    const sec=document.createElement("section");
+    sec.className="panel quad";sec.id="sec-"+q;
+    sec.style.setProperty("--qc",`var(${Q[q].c})`);sec.style.setProperty("--qbg",`var(${Q[q].bg})`);
+    sec.innerHTML=`<div class="head"><span class="letter">${q}</span><div><h2>${Q[q].nome}</h2><span class="tag">${Q[q].amb} · ${its.length} itens</span></div></div><div class="items"></div>`;
+    const list=sec.querySelector(".items");
+    for(const [x,i] of its){
+      const el=document.createElement("div");el.className="gi";el.id="it-"+x.c;
+      let h=`<div class="tx"><span class="code">${x.c}</span><p>${esc(x.t)}</p></div><div class="gsc">`;
+      DIM.forEach((d,k)=>{
+        h+=`<div class="grp" role="group" aria-label="${d==="G"?"Gravidade":d==="U"?"Urgência":"Tendência"} de ${x.c}"><b>${d}</b>`;
+        for(let n=1;n<=5;n++)h+=`<button type="button" data-i="${i}" data-k="${k}" data-n="${n}" title="${n} · ${LBL[d][n-1]}" aria-pressed="${st.v[i*3+k]===n}">${n}</button>`;
+        h+=`</div>`;
+      });
+      h+=`<span class="res">GxUxT <b id="r-${i}">—</b></span></div>`;
+      el.innerHTML=h;list.appendChild(el);
+    }
+    box.appendChild(sec);
+  }
+  for(let i=0;i<N;i++)atualItem(i);
+  contador();
+}
+function atualItem(i){
+  const v=st.v.slice(i*3,i*3+3);
+  $("#r-"+i).textContent=v.every(Boolean)?v[0]*v[1]*v[2]:"—";
+  const el=$("#it-"+ITENS[i].c);el.classList.toggle("ok",!!completo(i));if(completo(i))el.classList.remove("miss");
+}
+function contador(){
+  const c=$("#counter");let h="",tot=0;
+  for(const q of "SWOT"){
+    const idx=ITENS.map((x,i)=>i).filter(i=>ITENS[i].q===q);const f=idx.filter(completo).length;tot+=f;
+    h+=`<a class="chip q${q}${f===idx.length?" done":""}" href="#sec-${q}">${q} ${f}/${idx.length}</a>`;
+  }
+  h+=`<span class="spacer"></span><span class="chip" style="background:var(--soft)">${tot}/${N} itens</span>`;
+  c.innerHTML=h;
+  $("#env-resumo").textContent=tot===N?"Todos os itens foram avaliados. Confira seu ID e nome e envie.":`Faltam ${N-tot} item(ns) para completar a avaliação.`;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".grp button");if(!b)return;
+  const i=+b.dataset.i,k=+b.dataset.k,n=+b.dataset.n;
+  st.v[i*3+k]=n;salvar();
+  b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  atualItem(i);contador();
+});
+["matricula","nome"].forEach(id=>{const el=$("#"+id);el.value=st[id]||"";el.addEventListener("input",()=>{st[id]=el.value;salvar()})});
+
+async function chamar(corpo){
+  await carregarEndpoint;
+  if(!ENDPOINT)throw new Error("sem-endpoint");
+  const r=await fetch(ENDPOINT,{method:"POST",body:JSON.stringify(corpo)});
+  return await r.json();
+}
+$("#enviar").addEventListener("click",async()=>{
+  const m=$("#matricula").value.trim(),n=$("#nome").value.trim(),er=$("#err-id"),msg=$("#env-msg");msg.innerHTML="";
+  if(!m||!n){er.textContent="Preencha seu ID e seu nome.";er.hidden=false;$("#t-id").focus();$("#t-id").scrollIntoView({behavior:"smooth"});return}
+  er.hidden=true;
+  const falta=ITENS.map((x,i)=>i).filter(i=>!completo(i));
+  if(falta.length){
+    falta.forEach(i=>$("#it-"+ITENS[i].c).classList.add("miss"));
+    const el=$("#it-"+ITENS[falta[0]].c);el.scrollIntoView({behavior:"smooth",block:"center"});
+    msg.innerHTML=`<p class="notice">Faltam ${falta.length} item(ns) com notas incompletas (marcados em vermelho). O primeiro é o ${ITENS[falta[0]].c}.</p>`;return;
+  }
+  const b=$("#enviar");b.disabled=true;b.textContent="Enviando…";
+  try{
+    const res=await chamar({acao:"gut_salvar",m,n,t:st.t,v:st.v.join("")});
+    if(res&&res.ok){
+      msg.innerHTML=`<p class="notice ok">${res.atualizada?"Avaliação atualizada":"Avaliação registrada"}. Obrigado pela participação, ${esc(n.split(" ")[0])}!</p>`;
+      st.enviado=new Date().toISOString();salvar();
+    }else msg.innerHTML=`<p class="notice">Não foi possível gravar (${esc(res&&res.erro||"erro")}). Tente de novo em instantes.</p>`;
+  }catch(e){msg.innerHTML=`<p class="notice">${e&&e.message==="sem-endpoint"?"O banco de respostas ainda não foi configurado.":"Sem conexão. Suas notas continuam salvas neste aparelho; tente enviar de novo."}</p>`}
+  finally{b.disabled=false;b.textContent="Enviar avaliação"}
+});
+$("#limpar").addEventListener("click",function(){
+  if(this.dataset.c!=="1"){this.dataset.c="1";this.textContent="Confirmar: apagar todas as notas";this.classList.add("danger");return}
+  st={v:new Array(N*3).fill(0),t:new Date().toISOString(),matricula:st.matricula,nome:st.nome};salvar();
+  this.dataset.c="";this.textContent="Limpar minhas notas";this.classList.remove("danger");render();toast("Notas apagadas.");
+});
+
+/* ---------------- abas e senha ---------------- */
+async function sha256(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+const sw=v=>{$("#view-form").hidden=v!=="form";$("#view-fac").hidden=v!=="fac";$("#tab-form").setAttribute("aria-selected",v==="form");$("#tab-fac").setAttribute("aria-selected",v==="fac")};
+$("#tab-form").addEventListener("click",()=>sw("form"));$("#tab-fac").addEventListener("click",()=>sw("fac"));
+let senhaSessao="";
+$("#lock-form").addEventListener("submit",async e=>{e.preventDefault();const er=$("#err-senha");let ok=false;
+  try{ok=(await sha256($("#senha").value.trim()))===SENHA_HASH}catch(x){ok=false}
+  if(ok){er.hidden=true;senhaSessao=$("#senha").value.trim();$("#senha").value="";$("#lock").hidden=true;$("#fac-body").hidden=false;atualizar()}
+  else{er.textContent="Senha incorreta. Confira maiúsculas e minúsculas.";er.hidden=false}});
+
+/* ---------------- facilitador ---------------- */
+let parts=[]; /* {id,m,n,h,v:[216]} */
+const tamTime=()=>{const x=parseInt($("#time").value,10);return x>0?x:0};
+$("#time").value=store.get("gut-ep-time")||"";
+$("#time").addEventListener("input",()=>{store.set("gut-ep-time",$("#time").value);renderFac()});
+$("#atualizar").addEventListener("click",()=>atualizar());
+async function atualizar(){
+  const s=$("#srv-status");s.textContent="Buscando avaliações…";
+  try{
+    const res=await chamar({acao:"gut_listar",senha:senhaSessao});
+    if(!res.ok){s.textContent=res.erro==="senha"?"A senha do banco de respostas não confere.":"Não foi possível ler as avaliações.";return}
+    parts=(res.linhas||[]).slice(1).filter(r=>r[3]!==""||r[4]!=="").map(r=>({id:r[0],h:r[2]||r[1],m:String(r[3]),n:String(r[4]),v:r.slice(5,5+N*3).map(x=>{x=Number(x);return x>=1&&x<=5?x:0})}));
+    s.textContent=`${parts.length} avaliação(ões) · atualizado às ${fmtData(new Date().toISOString()).slice(11)}`;
+    renderFac();
+  }catch(e){s.textContent=e&&e.message==="sem-endpoint"?"O banco de respostas ainda não foi configurado.":"Sem conexão com o banco de respostas. Tente de novo."}
+}
+function calcular(){
+  const r=ITENS.map((x,i)=>{let soma=0,cnt=0,g=0,u=0,t=0;
+    for(const p of parts){const a=p.v[i*3],b=p.v[i*3+1],c=p.v[i*3+2];if(a&&b&&c){soma+=a*b*c;cnt++;g+=a;u+=b;t+=c}}
+    return {...x,i,soma,cnt,g:cnt?g/cnt:0,u:cnt?u/cnt:0,tn:cnt?t/cnt:0,media:cnt?soma/cnt:0}});
+  const ord=[...r].sort((a,b)=>b.soma-a.soma||b.media-a.media||a.i-b.i);
+  ord.forEach((x,k)=>x.pos=k+1);
+  return {r,ord};
+}
+function renderFac(){
+  const np=parts.length,tt=tamTime();
+  $("#st-part").textContent=np;
+  $("#st-ader").textContent=tt?Math.round(np/tt*100)+"%":"—";
+  const {ord}=calcular();
+  $("#top-body").innerHTML=np?ord.slice(0,10).map(x=>`<tr class="top"><td class="n">${x.pos}</td><td><span class="code" style="--qc:var(${Q[x.q].c});--qbg:var(${Q[x.q].bg})">${x.c}</span> ${esc(x.t)}</td><td class="n">${x.soma}</td><td class="n">${x.media.toFixed(1).replace(".",",")}</td><td class="n">${x.cnt}</td></tr>`).join(""):`<tr><td colspan="5" class="empty">Nenhuma avaliação recebida ainda.</td></tr>`;
+  $("#part-body").innerHTML=np?parts.map((p,k)=>`<tr><td>${esc(p.m)}</td><td>${esc(p.n)}</td><td>${esc(fmtData(p.h))}</td><td class="n">${p.v.reduce((a,b)=>a+b,0)}</td><td><button class="ghost" type="button" data-rm="${k}">Remover</button></td></tr>`).join(""):`<tr><td colspan="5" class="empty">Ninguém enviou ainda.</td></tr>`;
+}
+$("#part-body").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-rm]");if(!b)return;
+  if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Confirmar remoção";b.classList.add("danger");return}
+  const p=parts[+b.dataset.rm];b.disabled=true;
+  try{const res=await chamar({acao:"gut_remover",senha:senhaSessao,m:p.m,n:p.n});
+    if(res.ok){toast("Avaliação removida.");atualizar()}else{toast("Não foi possível remover.");b.disabled=false}}
+  catch(x){toast("Sem conexão.");b.disabled=false}
+});
+
+/* ---------------- Excel ---------------- */
+function carregarExcelJS(){
+  if(window.ExcelJS)return Promise.resolve();
+  return new Promise((ok,ko)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";s.onload=ok;s.onerror=ko;document.head.appendChild(s)});
+}
+$("#baixar").addEventListener("click",async()=>{
+  const s=$("#xls-status");
+  if(!parts.length){s.textContent="Ainda não há avaliações para exportar.";return}
+  s.textContent="Gerando planilha…";
+  try{await carregarExcelJS();const buf=await gerarExcel();
+    const blob=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+    const d=new Date(),p=n=>String(n).padStart(2,"0");
+    a.download=`GUT_SWOT_EngPackaging_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.xlsx`;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    s.textContent="Planilha gerada.";
+  }catch(e){console.error(e);s.textContent="Não foi possível gerar a planilha (verifique a conexão)."}
+});
+async function gerarExcel(){
+  const {r,ord}=calcular();const np=parts.length,tt=tamTime()||np;
+  const wb=new ExcelJS.Workbook();wb.creator="Engenharia Packaging";wb.created=new Date();
+  const CINZA={type:"pattern",pattern:"solid",fgColor:{argb:"FFD9D9D9"}};
+  const NAVY={type:"pattern",pattern:"solid",fgColor:{argb:"FF12284C"}};
+  const QF={S:"FFEAF4EA",W:"FFFBEFDF",O:"FFE5EFFB",T:"FFFBE8E8"};
+  const borda={top:{style:"thin",color:{argb:"FFBFBFBF"}},left:{style:"thin",color:{argb:"FFBFBFBF"}},bottom:{style:"thin",color:{argb:"FFBFBFBF"}},right:{style:"thin",color:{argb:"FFBFBFBF"}}};
+  const hdr=(row)=>row.eachCell(c=>{c.fill=NAVY;c.font={bold:true,color:{argb:"FFFFFFFF"}};c.alignment={vertical:"middle",horizontal:"center",wrapText:true};c.border=borda});
+  const agora=fmtData(new Date().toISOString());
+
+  /* 1) Ranking GUT */
+  const ws=wb.addWorksheet("Ranking GUT",{views:[{state:"frozen",ySplit:6}]});
+  ws.columns=[{width:9},{width:9},{width:15},{width:78},{width:12},{width:12},{width:12},{width:10},{width:10},{width:10},{width:13}];
+  ws.mergeCells("A1:K1");ws.getCell("A1").value="MATRIZ GUT · SWOT ENGENHARIA PACKAGING 2027 · RESULTADO ACUMULADO";
+  ws.getCell("A1").font={bold:true,size:14,color:{argb:"FF12284C"}};
+  ws.mergeCells("A2:K2");ws.getCell("A2").value=`Gerado em ${agora}. Ordenado pelo Σ GxUxT (soma de todos os participantes), do maior para o menor. Os 10 primeiros estão em cinza.`;
+  ws.getCell("A2").font={italic:true,color:{argb:"FF5B6878"}};
+  ws.getCell("A3").value="Pessoas no time";ws.getCell("C3").value=tt;
+  ws.getCell("D3").value="Participantes";ws.getCell("E3").value=np;
+  ws.getCell("F3").value="Aderência";ws.getCell("G3").value={formula:"IFERROR(E3/C3,0)",result:tt?np/tt:0};ws.getCell("G3").numFmt="0%";
+  ["A3","D3","F3"].forEach(a=>ws.getCell(a).font={bold:true});
+  ["C3","E3","G3"].forEach(a=>{ws.getCell(a).font={bold:true,size:12};ws.getCell(a).border=borda;ws.getCell(a).alignment={horizontal:"center"}});
+  ws.getCell("H3").value="← altere o tamanho do time em C3 e a aderência se recalcula";ws.getCell("H3").font={italic:true,size:9,color:{argb:"FF5B6878"}};
+  ws.getRow(6).values=["Posição","Código","Quadrante","Item","Σ GxUxT","Avaliações","Aderência","Média G","Média U","Média T","Média GxUxT"];
+  hdr(ws.getRow(6));ws.getRow(6).height=30;
+  ord.forEach((x,k)=>{
+    const rr=7+k;const row=ws.getRow(rr);
+    row.values=[x.pos,x.c,Q[x.q].sing,x.t,x.soma,x.cnt,{formula:`IFERROR(F${rr}/$C$3,0)`,result:tt?x.cnt/tt:0},x.g,x.u,x.tn,{formula:`IFERROR(E${rr}/F${rr},0)`,result:x.media}];
+    row.getCell(7).numFmt="0%";[8,9,10].forEach(c=>row.getCell(c).numFmt="0.0");row.getCell(11).numFmt="0.0";
+    row.eachCell({includeEmpty:true},(c,ci)=>{if(ci>11)return;c.border=borda;c.alignment={vertical:"middle",wrapText:ci===4,horizontal:ci===4?"left":"center"};if(k<10)c.fill=CINZA});
+    if(k>=10)row.getCell(3).fill={type:"pattern",pattern:"solid",fgColor:{argb:QF[x.q]}};
+    if(k<10)row.eachCell(c=>c.font={bold:true});
+  });
+  ws.autoFilter={from:"A6",to:`K${6+ord.length}`};
+
+  /* 2) BASE GUT (layout da proposta) */
+  const wbg=wb.addWorksheet("BASE GUT",{views:[{state:"frozen",ySplit:1}]});
+  wbg.columns=[{width:100},{width:16},{width:16},{width:16},{width:12},{width:12},{width:12},{width:12}];
+  const defs=["Gravidade ( Mede o impacto do problema ou ação caso ele ocorra ou persista, avaliando as consequências negativas para a empresa, processo ou pessoas)",
+    "Urgência (Indica o tempo disponível para resolver o problema ou executar a ação; quanto mais urgente, menor o prazo )",
+    "Tendência (Avalia a probabilidade de agravamento do problema ao longo do tempo, caso nenhuma ação seja tomada, ou a possibilidade de redução ou desaparecimento do problema)"];
+  const secs={S:[1,"Fortaleza"],W:[25,"Fraqueza"],O:[54,"Oportunidade"],T:[63,"Ameaça"]};
+  for(const q of "SWOT"){const [hr,nm]=secs[q];const row=wbg.getRow(hr);
+    row.values=[nm,...(hr===1?defs:["Gravidade (média)","Urgência (média)","Tendência (média)"]),"GxUxT (Σ)","Avaliações","Aderência","Posição"];
+    hdr(row);row.getCell(1).alignment={vertical:"middle",horizontal:"left"};row.height=hr===1?120:30;}
+  wbg.getRow(1).getCell(2).note="Nas linhas de itens: média das notas do time (1 a 5).";
+  for(const x of r){const row=wbg.getRow(x.r);
+    row.getCell(1).value=x.t;
+    row.getCell(2).value=+x.g.toFixed(2);row.getCell(3).value=+x.u.toFixed(2);row.getCell(4).value=+x.tn.toFixed(2);
+    row.getCell(5).value=x.soma;row.getCell(6).value=x.cnt;
+    row.getCell(7).value={formula:`IFERROR(F${x.r}/'Ranking GUT'!$C$3,0)`,result:tt?x.cnt/tt:0};row.getCell(7).numFmt="0%";
+    row.getCell(8).value=x.pos;
+    [2,3,4].forEach(c=>row.getCell(c).numFmt="0.0");
+    row.eachCell({includeEmpty:true},(c,ci)=>{if(ci>8)return;c.border=borda;c.alignment={vertical:"middle",wrapText:ci===1,horizontal:ci===1?"left":"center"};if(x.pos<=10){c.fill=CINZA;c.font={bold:true}}});
+  }
+
+  /* 3) Respostas (uma linha por pessoa e item) */
+  const wr=wb.addWorksheet("Respostas",{views:[{state:"frozen",ySplit:1}]});
+  wr.columns=[{header:"Seu ID",width:12},{header:"Seu nome",width:26},{header:"Enviado em",width:17},{header:"Código",width:9},{header:"Quadrante",width:14},{header:"Item",width:70},{header:"Gravidade",width:11},{header:"Urgência",width:11},{header:"Tendência",width:11},{header:"GxUxT",width:10}];
+  hdr(wr.getRow(1));
+  for(const p of parts)ITENS.forEach((x,i)=>{const a=p.v[i*3],b=p.v[i*3+1],c=p.v[i*3+2];
+    const rr=wr.rowCount+1;wr.addRow([p.m,p.n,fmtData(p.h),x.c,Q[x.q].sing,x.t,a||null,b||null,c||null,{formula:`IF(COUNT(G${rr}:I${rr})=3,G${rr}*H${rr}*I${rr},"")`,result:a&&b&&c?a*b*c:""}])});
+  wr.autoFilter={from:"A1",to:`J${wr.rowCount}`};
+
+  /* 4) Participação */
+  const wp=wb.addWorksheet("Participação");
+  wp.columns=[{width:14},{width:30},{width:18},{width:16},{width:16}];
+  wp.getCell("A1").value="Pessoas no time";wp.getCell("B1").value={formula:"'Ranking GUT'!C3",result:tt};
+  wp.getCell("A2").value="Participantes";wp.getCell("B2").value={formula:"COUNTA(A6:A1000)",result:np};
+  wp.getCell("A3").value="Aderência";wp.getCell("B3").value={formula:"IFERROR(B2/B1,0)",result:tt?np/tt:0};wp.getCell("B3").numFmt="0%";
+  ["A1","A2","A3"].forEach(a=>wp.getCell(a).font={bold:true});
+  wp.getRow(5).values=["Seu ID","Seu nome","Enviado em","Itens avaliados","Σ GxUxT dado"];hdr(wp.getRow(5));
+  parts.forEach(p=>{let it=0,s=0;ITENS.forEach((x,i)=>{const a=p.v[i*3],b=p.v[i*3+1],c=p.v[i*3+2];if(a&&b&&c){it++;s+=a*b*c}});
+    const row=wp.addRow([p.m,p.n,fmtData(p.h),it,s]);row.eachCell(c=>c.border=borda)});
+  return await wb.xlsx.writeBuffer();
+}
+
+render();
+</script>
+</body>
+</html>
